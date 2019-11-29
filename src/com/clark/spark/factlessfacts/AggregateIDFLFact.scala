@@ -10,8 +10,9 @@ import org.apache.spark.sql.{SQLContext, SaveMode}
 class AggregateIDFLFact extends Table {
   override def processRawToLowGrain(args: Array[String], ssqc: SQLContext, log: Logger): Unit = {
 
-    log.info(s"Processing Low Grain to AggregateIDFLFact for table : " + args(2))
-    val adlsPath = getAdlsPath(adlsName)
+    log.info(s"Processing Low Grain to AggregateIDFLFact for table : " )
+    var adlsName = args(3)
+    var adlsPath = getAdlsPath(adlsName)
     val aggregateIDFLFact = s"select hash64(coalesce(aggregate_id, '')) as aggregate_id_hash_key,aggregate_id, name, customer_id, birthdate, current_timestamp as etl_created_date, current_timestamp as etl_updated_date, 'clarkadmin' as etl_created_by, 'clarkadmin' as etl_updated_by, 'Nested_Json' as etl_source from read_json_flat_file"
     var fileList = 0
     try{

@@ -16,7 +16,6 @@ object ClarkInsightsApp {
     1 - Credential for ADLS authentication
     2 - Refresh URL/Auth token for ADLS authentication
     3 - ADLS Account Name
-    4 - Incremental / Historical
     */
 
     @transient lazy val log = Logger.getLogger(getClass.getName)
@@ -48,9 +47,11 @@ object ClarkInsightsApp {
       log.info("Get Class from TableFactory ")
       println("Get Class from TableFactory ")
 
-      val df = readJsonFileFromADLS(spark)
-      val flattenedDF = flattenDataFrame(spark, df)
+      var df = readJsonFileFromADLS(ssqc)
+      var flattenedDF : DataFrame = flattenDataFrame(spark, df)
       flattenedDF.createOrReplaceTempView("flattenedDF")
+      var adlsName = args(3)
+      var adlsPath = getAdlsPath(adlsName)
       try{
         fileList = dbutils.fs.ls(adlsPath + s"lg/customer_demographic").size
       }
