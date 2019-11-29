@@ -2,8 +2,9 @@ package com.clark.spark.util
 
 import org.apache.spark.sql.functions.col
 import org.apache.hive.common.util.{Murmur3 => MM3}
-import org.apache.spark.sql.{SQLContext, SparkSession}
+import org.apache.spark.sql.{DataFrame, SQLContext, SparkSession}
 import org.apache.spark.sql.functions._
+
 import scala.util.control._
 import scala.util.control.Breaks._
 object CommonUtils {
@@ -32,22 +33,22 @@ object CommonUtils {
     nestedDf.select(colNames: _*)
 
   }
-  def explodeJson(spark: SQLContext, df: DataFrame): DataFrame = {
-
-    val df2 = df.withColumn("data", explode($"data"))
-      .withColumn("birthdate", $"data"(0))
-      .withColumn("customer_id", $"data"(1))
-      .withColumn("name", $"data"(2))
-      .drop("data")
-    df2
-  }
+  //def explodeJson(spark: SQLContext, df: DataFrame): DataFrame = {
+//
+   // val df2 = df.withColumn("data", explode(s"$data"))
+  //    .withColumn("birthdate", "$data"(0))
+   //   .withColumn("customer_id", "$data"(1))
+    //  .withColumn("name", "$data"(2))
+   //   .drop("data")
+   // df2
+ // }
 
   def readJsonFileFromLocal(spark: SparkSession): DataFrame = {
     var nested_df = spark.read.json("file:\\D:\\Projects\\test-project\\events.json")
     nested_df
   }
 
-  def readJsonFileFromADLS(ssqc: SQLContext): DataFrame = {
+  def readJsonFileFromADLS(ssqc: SQLContext, adlsPath: String): DataFrame = {
     var nested_df = ssqc.read.parquet(adlsPath + s"raw/nested_df")
     nested_df
 

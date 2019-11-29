@@ -13,7 +13,7 @@ class IDFLFact extends Table {
     log.info(s"Processing Low Grain to AggregateIDFLFact for table : " )
     var adlsName = args(3)
     var adlsPath = getAdlsPath(adlsName)
-    val iDFLFact = s"select hash64(coalesce( id, '')) as  id_hash_key, id, name, customer_id, birthdate, current_timestamp as etl_created_date, current_timestamp as etl_updated_date, 'clarkadmin' as etl_created_by, 'clarkadmin' as etl_updated_by, 'Nested_Json' as etl_source from read_json_parquet"
+    val iDFLFact = s"select id, name, customer_id, birthdate, current_timestamp as etl_created_date, current_timestamp as etl_updated_date, 'clarkadmin' as etl_created_by, 'clarkadmin' as etl_updated_by, 'Nested_Json' as etl_source from read_json_parquet"
     var fileList = 0
     try{
       fileList = dbutils.fs.ls(adlsPath + s"lg/aggregate_id_fl_fact").size

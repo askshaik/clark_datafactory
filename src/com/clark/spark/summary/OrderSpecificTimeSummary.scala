@@ -12,7 +12,7 @@ class OrderSpecificTimeSummary extends Table {
     log.info(s"Processing Low Grain to OrderSpecificTimeSummary for table : " )
     var adlsName = args(3)
     var adlsPath = getAdlsPath(adlsName)
-    val orderSpecificTimeSummary = s"select hash64(concat(coalesce(customer_id, 01),coalesce(birthdate,'1900-12-31'), coalesce(name,'')) as customer_hash_key, name, customer_id, birthdate, floor(months_between(current_date,cast(birthdate as date))/12) age_in_year, floor(mod(months_between(current_date,cast(birthdate as date)),12)) age_in_month , floor(DATEDIFF (current_date, add_months(cast(birthdate as date),floor(months_between(current_date,cast(birthdate as date))/12)*12+floor(mod(months_between(current_date,cast(birthdate as date)),12))))) age_in_day ,current_timestamp as etl_created_date, current_timestamp as etl_updated_date, 'clarkadmin' as etl_created_by, 'clarkadmin' as etl_updated_by, 'Nested_Json' as etl_source from read_json_parquet"
+    val orderSpecificTimeSummary = s"select min(event_timestamp) as  order_accepted_time, max(event_timestamp) as order_fulfilled_time,floor((unix_timestamp(max(event_timestamp)) - unix_timestamp(min(event_timestamp)))/60) as order_completion_in_min,floor((unix_timestamp(max(event_timestamp)) - unix_timestamp(min(event_timestamp)))) as order_completion_in_sec,floor((unix_timestamp(max(event_timestamp)) - unix_timestamp(min(event_timestamp)))/3600) as order_completion_in_hr, aggregate_id from read_json_parquet where type in ('order_accepted','order_fulfilled') group by aggregate_id order by aggregate_id "
 
     ssqc.read.parquet(adlsPath + s"raw/nested_df").createOrReplaceTempView("read_json_parquet")
 

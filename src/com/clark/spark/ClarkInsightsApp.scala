@@ -47,13 +47,16 @@ object ClarkInsightsApp {
       log.info("Get Class from TableFactory ")
       println("Get Class from TableFactory ")
 
-      var df = readJsonFileFromADLS(ssqc)
-      var flattenedDF : DataFrame = flattenDataFrame(spark, df)
-      flattenedDF.createOrReplaceTempView("flattenedDF")
+
       var adlsName = args(3)
       var adlsPath = getAdlsPath(adlsName)
+
+      var df = readJsonFileFromADLS(ssqc,adlsPath)
+      var flattenedDF  = flattenDataFrame(spark, df)
+      flattenedDF.createOrReplaceTempView("flattenedDF")
+      var fileList = 0
       try{
-        fileList = dbutils.fs.ls(adlsPath + s"lg/customer_demographic").size
+         fileList = dbutils.fs.ls(adlsPath + s"lg/customer_demographic").size
       }
       catch {
         case e: Exception => e.printStackTrace
@@ -67,11 +70,17 @@ object ClarkInsightsApp {
         ssqc.sql(s"select * from flattenedDF").write.mode(SaveMode.Overwrite).parquet(adlsPath + s"raw/nested_df")
       }
       log.info("Dimension table update: " )
-      TableFactory(CustomerDemographic).processRawToLowGrain(args, ssqc, log)
+      TableFactory("CustomerDemographic").processRawToLowGrain(args, ssqc, log)
 
       log.info("FactlessFact table update: " )
-      TableFactory(AggregateIDFLFact).processRawToLowGrain(args, ssqc, log)
-      TableFactory(IDFLFact).processRawToLowGrain(args, ssqc, log)
+      TableFactory("AggregateIDFLFact").processRawToLowGrain(args, ssqc, log)
+      TableFactory("IDFLFact").processRawToLowGrain(args, ssqc, log)
+
+      log.info("Summary table update: " )
+
+      TableFactory("OrderSpecificTimeSummary").processRawToLowGrain(args, ssqc, log)
+      TableFactory("ProbabilitySummary").processRawToLowGrain(args, ssqc, log)
+      TableFactory("TimeToFulfilOrderSummary").processRawToLowGrain(args, ssqc, log)
       //ADLS Gen 2 Configuration
       spark.conf.set("fs.azure.createRemoteFileSystemDuringInitialization", "false")
     } catch {

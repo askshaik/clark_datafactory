@@ -16,6 +16,9 @@ object TableFactory {
     tableMap.put("CustomerDemographic", new CustomerDemographic)
     tableMap.put("AggregateIDFLFact", new AggregateIDFLFact)
     tableMap.put("IDFLFact", new IDFLFact)
+    tableMap.put("OrderSpecificTimeSummary", new OrderSpecificTimeSummary)
+    tableMap.put("ProbabilitySummary", new ProbabilitySummary)
+    tableMap.put("TimeToFulfilOrderSummary", new TimeToFulfilOrderSummary)
     tableMap(tableName)
   }
 }
