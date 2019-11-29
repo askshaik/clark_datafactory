@@ -42,7 +42,12 @@ object CommonUtils {
     df2
   }
 
-  def readJsonFile(spark: SparkSession): DataFrame = {
+  def readJsonFileFromLocal(spark: SparkSession): DataFrame = {
+    var nested_df = ssqc.read.parquet(adlsPath + s"raw/nested_df")
+    nested_df
+  }
+
+  def readJsonFileFromADLS(spark: SparkSession): DataFrame = {
     spark.read.json("file:\\D:\\Projects\\test-project\\events.json")
 
   }
@@ -51,10 +56,10 @@ object CommonUtils {
   }
   def getAdlsPath(adlsName: String, client: String, brand: String): (String, String, String, String) = {
 
-    val adlsRaw = s"adl://$adlsName.azuredatalakestore.net/fishbowl/insights/$client/$brand/raw/"
-    val adlsLowGrain = s"adl://$adlsName.azuredatalakestore.net/fishbowl/insights/$client/$brand/lg/"
-    val adlsStg = s"adl://$adlsName.azuredatalakestore.net/fishbowl/insights/$client/$brand/stg/"
-    val adlsDelta = s"adl://$adlsName.azuredatalakestore.net/fishbowl/insights/$client/$brand/delta_lg/"
+    val adlsRaw = s"adl://$adlsName.azuredatalakestore.net/clark/raw/"
+    val adlsLowGrain = s"adl://$adlsName.azuredatalakestore.net/clark/lg/"
+    val adlsStg = s"adl://$adlsName.azuredatalakestore.net/clark/stg/"
+    val adlsDelta = s"adl://$adlsName.azuredatalakestore.net/clark/delta_lg/"
     (adlsRaw, adlsLowGrain, adlsStg, adlsDelta)
   }
 
@@ -66,8 +71,8 @@ object CommonUtils {
   def getAdlsPath(adlsName: String): String = {
 
     //adls Gen 1
-    //s"adl://$adlsName.azuredatalakestore.net/fishbowl/"
+    s"adl://$adlsName.azuredatalakestore.net/clark/"
     //adls Gen 2
-    s"abfss://fishbowl@$adlsName.dfs.core.windows.net/"
+    //s"abfss://clark@$adlsName.dfs.core.windows.net/"
   }
 }
